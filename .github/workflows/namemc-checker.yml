@@ -1,0 +1,31 @@
+name: NameMC Checker
+
+on:
+  schedule:
+    - cron: "*/2 * * * *"  # every 2 minutes
+  workflow_dispatch:
+
+jobs:
+  run-checker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout repo
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 📦 Install dependencies
+        run: |
+          pip install aiohttp playwright playwright-stealth
+          playwright install chromium
+
+      - name: 🚀 Run script
+        env:
+          WEBHOOK_ALERT: ${{ secrets.WEBHOOK_ALERT }}
+          CHECK_INTERVAL: 30
+        run: |
+          python main.py
